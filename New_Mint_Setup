@@ -33,23 +33,25 @@ sudo apt-get install rkhunter -y
 echo -e "*******************************"
 echo -e "* configuring 'rkhunter.conf' *"
 echo -e "*******************************"
+
+#quick permission change to allow easy edits
+#this should be revised for security purposes as 777 is excessive and +s may be unnecessary
 sudo chmod 777 /etc/rkhunter.conf
 sudo chmod +s /etc/rkhunter.conf
 
-
-#'SCRIPTWHITELIST=bin/egrep'
+# whitelisting /usr/bin/egrep so that rkhunter will run
 while read a; do
 	echo ${a//'SCRIPTWHITELIST=/usr/bin/egrep'/'#SCRIPTWHITELIST=/usr/bin/egrep'}
 done < /etc/rkhunter.conf > /etc/rkhunter.conf.t
 sudo mv /etc/rkhunter.conf{.t,}
 
-
-#'SCRIPTWHITELIST=bin/fgrep' 'SCRIPTWHITELIST=bin/which'
+# whitelisting /usr/bin/fgrep so that rkhunter will run
 while read a; do
         echo ${a//'SCRIPTWHITELIST=/usr/bin/fgrep'/'#SCRIPTWHITELIST=/usr/bin/fgrep'}
 done < /etc/rkhunter.conf > /etc/rkhunter.conf.t
 sudo mv /etc/rkhunter.conf{.t,}
 
+#changing the file permissions back to where they should be
 sudo chmod 544 /etc/rkhunter.conf
 
 
