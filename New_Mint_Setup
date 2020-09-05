@@ -39,13 +39,13 @@ echo -e "*******************************"
 sudo chmod 777 /etc/rkhunter.conf
 sudo chmod +s /etc/rkhunter.conf
 
-# whitelisting /usr/bin/egrep so that rkhunter will run
+# un-whitelisting /usr/bin/egrep so that rkhunter will run
 while read a; do
 	echo ${a//'SCRIPTWHITELIST=/usr/bin/egrep'/'#SCRIPTWHITELIST=/usr/bin/egrep'}
 done < /etc/rkhunter.conf > /etc/rkhunter.conf.t
 sudo mv /etc/rkhunter.conf{.t,}
 
-# whitelisting /usr/bin/fgrep so that rkhunter will run
+# un-whitelisting /usr/bin/fgrep so that rkhunter will run
 while read a; do
         echo ${a//'SCRIPTWHITELIST=/usr/bin/fgrep'/'#SCRIPTWHITELIST=/usr/bin/fgrep'}
 done < /etc/rkhunter.conf > /etc/rkhunter.conf.t
