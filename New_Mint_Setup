@@ -17,6 +17,12 @@ echo -e "* Updating and upgrading *"
 echo -e "**************************"
 sudo apt-get update && sudo apt-get dist-upgrade -y
 
+# enable host based firewall (ufw)
+echo -e "********************************"
+echo -e "* Enabling host based firewall *"
+echo -e "********************************"
+sudo ufw enable
+
 # install clamav
 echo -e "*********************************"
 echo -e "* Installing 'clamav' antivirus *"
