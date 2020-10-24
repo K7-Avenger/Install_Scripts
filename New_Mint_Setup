@@ -2,6 +2,7 @@
 #	written by walkerd1217@gmail.com
 #	The purpose of this script is to update/upgrade the system & automate the 
 #	installation/configuration of clamav and rkhunter on linux mint 20.
+#	Enabling host based firewall (ufw) added 10/23/2020
 
 echo -e "********************************************************************************"
 echo -e "* This script is not intended to handle passowrds                              *"
