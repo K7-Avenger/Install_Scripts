@@ -1,8 +1,9 @@
 #!/bin/bash
-#	written by walkerd1217@gmail.com
+#	written by walker.derek@protonmail.com
 #	The purpose of this script is to update/upgrade the system & automate the 
 #	installation/configuration of clamav and rkhunter on linux mint 20.
 #	Enabling host based firewall (ufw) added 10/23/2020
+#	Updated email address, & added suggestion for pause feature before the remainder of th script runs.
 
 echo -e "********************************************************************************"
 echo -e "* This script is not intended to handle passowrds                              *"
@@ -11,6 +12,8 @@ echo -e "* as an alternative to running this script, the commands may be run man
 echo -e "* to view the contents of this script, open it in any text editor.             *"
 echo -e "* press 'ctrl+c' to kill the running process at any time.                      *"
 echo -e "********************************************************************************"
+
+# <--Add pause for "press 'ctrl+c' to kill script, any other key to continue."
 
 # update and upgrade system
 echo -e "**************************"
