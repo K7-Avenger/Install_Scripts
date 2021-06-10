@@ -4,6 +4,7 @@
 #	installation/configuration of clamav and rkhunter on linux mint 20.
 #	Enabling host based firewall (ufw) added 10/23/2020
 #	Updated email address, & added suggestion for pause feature before the remainder of th script runs.
+# Added time clock adjustment 6-10-21
 
 echo -e "********************************************************************************"
 echo -e "* This script is not intended to handle passowrds                              *"
