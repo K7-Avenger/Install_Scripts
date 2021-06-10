@@ -15,7 +15,7 @@ echo -e "***********************************************************************
 
 # <--Add pause for "press 'ctrl+c' to kill script, any other key to continue."
 # <--Add code for configuring dns servers with 1.1.1.1 & 1.0.0.1
-# <--Add option for fixing system time for dual boot situations
+# <--Add option for fixing system time for dual boot situations using "timedatectl set-local-rtc 1 --adjust-system-clock"
 # <--Add option to customize the grub boot menu 
 
 # update and upgrade system
