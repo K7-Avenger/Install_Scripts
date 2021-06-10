@@ -15,7 +15,6 @@ echo -e "***********************************************************************
 
 # <--Add pause for "press 'ctrl+c' to kill script, any other key to continue."
 # <--Add code for configuring dns servers with 1.1.1.1 & 1.0.0.1
-# <--Add option for fixing system time for dual boot situations using "timedatectl set-local-rtc 1 --adjust-system-clock"
 # <--Add option to customize the grub boot menu 
 
 # update and upgrade system
@@ -23,6 +22,12 @@ echo -e "**************************"
 echo -e "* Updating and upgrading *"
 echo -e "**************************"
 sudo apt-get update && sudo apt-get dist-upgrade -y
+
+# adjust clock to avoid time conflicts in dual boot systems
+echo -e "****************************************************************"
+echo -e "* Adjusting clock to avoid time conflicts in dual-boot systems *"
+echo -e "****************************************************************"
+sudo timedatectl set-local-rtc 1 --adjust-system-clock
 
 # enable host based firewall (ufw)
 echo -e "********************************"
@@ -41,41 +46,6 @@ echo -e "*****************************************"
 echo -e "* Installing 'rkhunter' root-kit hunter *"
 echo -e "*****************************************"
 sudo apt-get install rkhunter -y
-
-##################################################################################################
-# no longer needed as issues requiring this change have been resolved within os updates
-##################################################################################################
-# configure rkhunter
-#echo -e "*******************************"
-#echo -e "* configuring 'rkhunter.conf' *"
-#echo -e "*******************************"
-
-#quick permission change to allow easy edits
-#this should be revised for security purposes as 777 is excessive and +s may be unnecessary
-#sudo chmod 777 /etc/rkhunter.conf
-#sudo chmod +s /etc/rkhunter.conf
-
-# un-whitelisting /usr/bin/egrep so that rkhunter will run
-#while read a; do
-#	echo ${a//'SCRIPTWHITELIST=/usr/bin/egrep'/'#SCRIPTWHITELIST=/usr/bin/egrep'}
-#done < /etc/rkhunter.conf > /etc/rkhunter.conf.t
-#sudo mv /etc/rkhunter.conf{.t,}
-
-# un-whitelisting /usr/bin/fgrep so that rkhunter will run
-#while read a; do
-#        echo ${a//'SCRIPTWHITELIST=/usr/bin/fgrep'/'#SCRIPTWHITELIST=/usr/bin/fgrep'}
-#done < /etc/rkhunter.conf > /etc/rkhunter.conf.t
-#sudo mv /etc/rkhunter.conf{.t,}
-
-#changing the file permissions back to where they should be
-#sudo chmod 544 /etc/rkhunter.conf
-
-# update rkhunter & run scan
-#echo -e "********************************************************"
-#echo -e "* Updating 'rkhunter to use revised configuration file *"
-#echo -e "********************************************************"
-#sudo rkhunter -C
-##########################################################################################
 
 sudo rkhunter --propupd
 
