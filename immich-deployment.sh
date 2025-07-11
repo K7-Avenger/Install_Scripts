@@ -36,3 +36,9 @@ resolve-docker-dependancies(){
   # Verify successful installation:
   sudo docker run hello-world
 }
+
+download-immich-files(){
+  wget -P /$INSTALL_DIR/ docker-compose.yml https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+  wget -P /$INSTALL_DIR/ https://github.com/immich-app/immich/releases/latest/download/example.env
+  
+}
