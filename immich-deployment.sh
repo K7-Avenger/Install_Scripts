@@ -40,5 +40,31 @@ resolve-docker-dependancies(){
 download-immich-files(){
   wget -P /$INSTALL_DIR/ docker-compose.yml https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
   wget -P /$INSTALL_DIR/ https://github.com/immich-app/immich/releases/latest/download/example.env
+
+  #update .env file values (overwrite default DB uname/passwd)
+	#passwd_1get immich-db-uname from user
+	
+  PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
+  PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
   
+  while [[ "$PASSWORD_1" != "$PASSWORD_2" ]]; do
+  	echo "Passwords do not match."
+  	read -p "Would you like to try again? (y/n): " choice
+  
+  	case "$choice" in
+  		[Nn]*)
+  			exit 1
+  			unset PASSWORD_1
+  			unset PASSWORD_2
+  			;;
+  		[Yy]*)
+  			PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
+  			PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
+  			;;
+  		*)
+  			echo "Invalid input, please use 'y' or 'n'. "
+  			;;
+  	esac
+  done
+
 }
