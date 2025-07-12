@@ -68,3 +68,9 @@ download-immich-files(){
   done
 
 }
+
+main(){
+	mkdir $INSTALL_DIR
+	download-immich-files
+
+}
