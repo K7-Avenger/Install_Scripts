@@ -44,8 +44,15 @@ download-immich-files(){
   #update .env file values (overwrite default DB uname/passwd)
 	#passwd_1get immich-db-uname from user
 	
+  
+
+}
+
+update-env-file(){
   PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
   PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
+  ENV_FILE="/$INSTALL_DIR/example.env"
+  TARGET_VAR="DB_PASSWORD"
   
   while [[ "$PASSWORD_1" != "$PASSWORD_2" ]]; do
   	echo "Passwords do not match."
@@ -66,11 +73,19 @@ download-immich-files(){
   			;;
   	esac
   done
-
+  
+  sed -i.bak "s/^${TARGET_VAR}=.*/${TARGET_VAR}=${PASSWORD_1}/" "$ENV_FILE"
+  
+  unset PASSWORD_1
+  unset PASSWORD_2
 }
 
 main(){
-	mkdir $INSTALL_DIR
-	download-immich-files
+  mkdir $INSTALL_DIR
+  resolve-docker-dependancies
+  download-immich-files
+  update-env-file
 
 }
+
+main
