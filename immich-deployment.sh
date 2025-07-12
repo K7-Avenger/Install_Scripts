@@ -31,7 +31,7 @@ resolve-docker-dependancies(){
   sudo apt-get update
 
   # Install latest version of docker:
-  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
   # Verify successful installation:
   sudo docker run hello-world
@@ -48,11 +48,11 @@ download-immich-files(){
 
 }
 
-update-env-file(){
+update-env-file(){LS  
   PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
   PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
   ENV_FILE="/$INSTALL_DIR/example.env"
-  TARGET_VAR="DB_PASSWORD"
+  TARGET_VAR_PASSWD="DB_PASSWORD"
   
   while [[ "$PASSWORD_1" != "$PASSWORD_2" ]]; do
   	echo "Passwords do not match."
@@ -73,11 +73,12 @@ update-env-file(){
   			;;
   	esac
   done
-  
-  sed -i.bak "s/^${TARGET_VAR}=.*/${TARGET_VAR}=${PASSWORD_1}/" "$ENV_FILE"
-  
+
+  sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${PASSWORD_1}/" "$ENV_FILE"
+    
   unset PASSWORD_1
   unset PASSWORD_2
+  chmod 640 $ENV_FILE
 }
 
 main(){
