@@ -52,8 +52,14 @@ update-env-file(){
   PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
   PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
   ENV_FILE="$INSTALL_DIR/example.env"
+  
+  
+  TARGET_VAR_UPLOAD="UPLOAD_LOCATION"
   UPLOAD_DIR="$INSTALL_DIR/library"
+  
+  TARGET_VAR_DATA="DB_DATA_LOCATION"
   DB_DATA_DIR="$INSTALL_DIR/postgres"
+  
   TARGET_VAR_PASSWD="DB_PASSWORD"
   
   while [[ "$PASSWORD_1" != "$PASSWORD_2" ]]; do
@@ -76,6 +82,8 @@ update-env-file(){
   	esac
   done
 
+  sed -i.bak "s/^${TARGET_VAR_UPLOAD}=.*/${TARGET_VAR_UPLOAD}=${UPLOAD_DIR}/" "$ENV_FILE"
+  sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${DB_DATA_DIR}/" "$ENV_FILE"
   sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${PASSWORD_1}/" "$ENV_FILE"
   sed -i.bak 's/^# TZ=Etc\/UTC$/TZ=Cst\/UTC/' $ENV_FILE
   
