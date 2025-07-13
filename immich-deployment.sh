@@ -13,7 +13,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 RESET='\033[0m'
 
-INSTALL_DIR="./immich-app"
+INSTALL_DIR="/immich-app"
 
 resolve-docker-dependancies(){
   # Add Docker's official GPG key:
