@@ -82,10 +82,10 @@ update-env-file(){
   	esac
   done
 
-  sed -i.bak "s/^${TARGET_VAR_UPLOAD}=.*/${TARGET_VAR_UPLOAD}=${UPLOAD_DIR}/" "$ENV_FILE"
-  sed -i.bak "s/^${TARGET_VAR_DATA}=.*/${TARGET_VAR_DATA}=${DB_DATA_DIR}/" "$ENV_FILE"
-  sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${PASSWORD_1}/" "$ENV_FILE"
-  sed -i.bak 's/^# TZ=Etc\/UTC$/TZ=Cst\/UTC/' $ENV_FILE
+  sed -i.bak "s|^${TARGET_VAR_UPLOAD}=.*|${TARGET_VAR_UPLOAD}=${UPLOAD_DIR}|" "$ENV_FILE"
+  sed -i "s|^${TARGET_VAR_DATA}=.*|${TARGET_VAR_DATA}=${DB_DATA_DIR}|" "$ENV_FILE"
+  sed -i "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${PASSWORD_1}/" "$ENV_FILE"
+  sed -i "s/^# TZ=Etc\/UTC$/TZ=Cst\/UTC/" $ENV_FILE
   
   unset PASSWORD_1
   unset PASSWORD_2
