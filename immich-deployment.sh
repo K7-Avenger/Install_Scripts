@@ -48,7 +48,7 @@ download-immich-files(){
 
 }
 
-update-env-file(){LS  
+update-env-file(){  
   PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
   PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
   ENV_FILE="/$INSTALL_DIR/example.env"
