@@ -75,7 +75,8 @@ update-env-file(){LS
   done
 
   sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${PASSWORD_1}/" "$ENV_FILE"
-    
+  sed -i.bak 's/^# TZ=Etc\/UTC$/TZ=Cst\/UTC/' .env
+  
   unset PASSWORD_1
   unset PASSWORD_2
   chmod 640 $ENV_FILE
