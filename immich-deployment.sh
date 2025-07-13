@@ -83,7 +83,7 @@ update-env-file(){
   done
 
   sed -i.bak "s/^${TARGET_VAR_UPLOAD}=.*/${TARGET_VAR_UPLOAD}=${UPLOAD_DIR}/" "$ENV_FILE"
-  sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${DB_DATA_DIR}/" "$ENV_FILE"
+  sed -i.bak "s/^${TARGET_VAR_DATA}=.*/${TARGET_VAR_DATA}=${DB_DATA_DIR}/" "$ENV_FILE"
   sed -i.bak "s/^${TARGET_VAR_PASSWD}=.*/${TARGET_VAR_PASSWD}=${PASSWORD_1}/" "$ENV_FILE"
   sed -i.bak 's/^# TZ=Etc\/UTC$/TZ=Cst\/UTC/' $ENV_FILE
   
