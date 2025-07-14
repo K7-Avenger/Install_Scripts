@@ -51,12 +51,6 @@ resolve-docker-dependancies(){
 download-immich-files(){
   wget -P /$INSTALL_DIR/ docker-compose.yml https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
   wget -P /$INSTALL_DIR/ https://github.com/immich-app/immich/releases/latest/download/example.env
-
-  #update .env file values (overwrite default DB uname/passwd)
-	#passwd_1get immich-db-uname from user
-	
-  
-
 }
 
 #The purpose of this function is to ask the user to enter a new (non-default)
@@ -68,8 +62,11 @@ update-env-file(){
   DB_DATA_DIR="$INSTALL_DIR/postgres"
   TARGET_VAR_PASSWD="DB_PASSWORD"
 
+  #If the password prompt times out (inactivity) the password set on the .env file 
+  #will be blank. Immich will not start with this value blank.
   PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
   PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
+  
   ENV_FILE="$INSTALL_DIR/example.env"
     
   while [[ "$PASSWORD_1" != "$PASSWORD_2" ]]; do
