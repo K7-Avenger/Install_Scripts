@@ -98,7 +98,7 @@ main(){
   resolve-docker-dependancies
   download-immich-files
   update-env-file
-
+  docker compose up -d
 }
 
 main
