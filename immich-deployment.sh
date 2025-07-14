@@ -15,6 +15,17 @@ RESET='\033[0m'
 
 INSTALL_DIR="/immich-app"
 
+#The purpose of this function is to check if the script is being executed with
+#root/admin permissions. This is required for certian aspects of the script.
+check-for-admin(){
+  if [[ "$EUID" -ne 0 ]]; then
+    echo "This script must be run as root. Use sudo or switch to the root user."
+    exit 1
+  fi
+}
+
+#The purpose of this function is to download and install the docker related
+#dependancies required to run Immich.
 resolve-docker-dependancies(){
   # Add Docker's official GPG key:
   sudo apt-get update
@@ -48,20 +59,19 @@ download-immich-files(){
 
 }
 
+#The purpose of this function is to ask the user to enter a new (non-default)
+#password for the Immich database and update the corrisponding .env file.
 update-env-file(){  
+  TARGET_VAR_UPLOAD="UPLOAD_LOCATION"
+  UPLOAD_DIR="$INSTALL_DIR/library"
+  TARGET_VAR_DATA="DB_DATA_LOCATION"
+  DB_DATA_DIR="$INSTALL_DIR/postgres"
+  TARGET_VAR_PASSWD="DB_PASSWORD"
+
   PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
   PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
   ENV_FILE="$INSTALL_DIR/example.env"
-  
-  
-  TARGET_VAR_UPLOAD="UPLOAD_LOCATION"
-  UPLOAD_DIR="$INSTALL_DIR/library"
-  
-  TARGET_VAR_DATA="DB_DATA_LOCATION"
-  DB_DATA_DIR="$INSTALL_DIR/postgres"
-  
-  TARGET_VAR_PASSWD="DB_PASSWORD"
-  
+    
   while [[ "$PASSWORD_1" != "$PASSWORD_2" ]]; do
   	echo "Passwords do not match."
   	read -p "Would you like to try again? (y/n): " choice
@@ -89,11 +99,12 @@ update-env-file(){
   
   unset PASSWORD_1
   unset PASSWORD_2
-  chmod 640 $ENV_FILE
+  chmod 440 $ENV_FILE
   mv $ENV_FILE $INSTALL_DIR/.env
 }
 
 main(){
+  check-for-admin
   mkdir $INSTALL_DIR
   resolve-docker-dependancies
   download-immich-files
