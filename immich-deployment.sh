@@ -115,7 +115,7 @@ main(){
   echo -e -n "${GREEN}"
   echo -n "http://$(hostname -I | cut -d ' ' -f1):2283"
   echo -e "${RESET}"
-  echo -n "and click on the Getting Started button."
+  echo "and click on the Getting Started button."
 }
 
 main
