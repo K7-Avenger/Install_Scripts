@@ -99,7 +99,11 @@ main(){
   download-immich-files
   update-env-file
   docker compose up -d
-  echo "To register for the admin user, access the web application at http://$(hostname -I | cut -d ' ' -f1):2283 and click on the Getting Started button."
+  echo "To register for the admin user, access the web application at "
+  echo -e -n "${GREEN}"
+  echo -n "http://$(hostname -I | cut -d ' ' -f1):2283"
+  echo -e "${RESET}"
+  echo -n "and click on the Getting Started button."
 }
 
 main
