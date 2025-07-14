@@ -108,6 +108,7 @@ main(){
   update-env-file
   cd $INSTALL_DIR
   sudo docker compose up -d
+  #Add a health-check here prior to displaying next-steps
   echo "To register for the admin user, access the web application at "
   echo -e -n "${GREEN}"
   echo -n "http://$(hostname -I | cut -d ' ' -f1):2283"
