@@ -99,6 +99,7 @@ main(){
   download-immich-files
   update-env-file
   docker compose up -d
+  echo "To register for the admin user, access the web application at http://<machine-ip-address>:2283 and click on the Getting Started button."
 }
 
 main
