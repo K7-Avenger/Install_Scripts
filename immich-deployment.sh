@@ -109,6 +109,7 @@ main(){
   resolve-docker-dependancies
   download-immich-files
   update-env-file
+  cd $INSTALL_DIR
   sudo docker compose up -d
   echo "To register for the admin user, access the web application at "
   echo -e -n "${GREEN}"
