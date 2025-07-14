@@ -62,10 +62,8 @@ update-env-file(){
   DB_DATA_DIR="$INSTALL_DIR/postgres"
   TARGET_VAR_PASSWD="DB_PASSWORD"
 
-  #If the password prompt times out (inactivity) the password set on the .env file 
-  #will be blank. Immich will not start with this value blank.
-  PASSWORD_1=$(systemd-ask-password "Enter new database password: ")
-  PASSWORD_2=$(systemd-ask-password "Confirm new password: ")
+  PASSWORD_1=$(systemd-ask-password --timeout=0 "Enter new database password: ")
+  PASSWORD_2=$(systemd-ask-password --timeout=0 "Confirm new password: ")
   
   ENV_FILE="$INSTALL_DIR/example.env"
     
