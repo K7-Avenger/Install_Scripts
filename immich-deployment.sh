@@ -89,7 +89,8 @@ update-env-file(){
   
   unset PASSWORD_1
   unset PASSWORD_2
-  #chmod 640 $ENV_FILE
+  chmod 640 $ENV_FILE
+  mv $ENV_FILE $INSTALL_DIR/.env
 }
 
 main(){
