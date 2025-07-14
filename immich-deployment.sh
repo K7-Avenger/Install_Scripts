@@ -98,7 +98,7 @@ main(){
   resolve-docker-dependancies
   download-immich-files
   update-env-file
-  docker compose up -d
+  sudo docker compose up -d
   echo "To register for the admin user, access the web application at "
   echo -e -n "${GREEN}"
   echo -n "http://$(hostname -I | cut -d ' ' -f1):2283"
