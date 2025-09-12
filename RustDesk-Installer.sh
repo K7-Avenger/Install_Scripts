@@ -47,8 +47,7 @@ resolve-docker-dependancies(){
 }
 
 download-rustdesk-files(){
-#  wget -P /$INSTALL_DIR/ docker-compose.yml https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
-#  wget -P /$INSTALL_DIR/ https://github.com/immich-app/immich/releases/latest/download/example.env
+  wget rustdesk.com/oss.yml -O compose.yml
 }
 
 
@@ -56,15 +55,10 @@ download-rustdesk-files(){
 main(){
   check-for-admin
   mkdir $INSTALL_DIR
+  cd $INSTALL_DIR
   resolve-docker-dependancies
   download-rustdesk-files
   sudo docker compose up -d
-  #Add a health-check here prior to displaying next-steps
-  echo "To register for the admin user, access the web application at "
-  echo -e -n "${GREEN}"
-  echo -n "http://$(hostname -I | cut -d ' ' -f1):2283"
-  echo -e "${RESET}"
-  echo "and click on the Getting Started button."
 }
 
 main
