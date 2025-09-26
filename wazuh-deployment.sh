@@ -57,7 +57,6 @@ main(){
   echo -e -n "${GREEN}"
   echo -n "Login at https://$(hostname -I | cut -d ' ' -f1):443 with the provided credentials"
   echo -e "${RESET}"
-  echo "and click on the Getting Started button."
 }
 
 main
