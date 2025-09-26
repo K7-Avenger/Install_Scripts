@@ -17,7 +17,9 @@ RESET='\033[0m'
 #root/admin permissions. This is required for certian aspects of the script.
 check-for-admin(){
   if [[ "$EUID" -ne 0 ]]; then
+    echo -e -n "${RED}"
     echo "This script must be run as root. Use sudo or switch to the root user."
+    echo -e -n "${RESET}"
     exit 1
   fi
 }
