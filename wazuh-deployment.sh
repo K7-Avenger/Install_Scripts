@@ -27,7 +27,7 @@ check-for-admin(){
 perform-system-updates(){
   sudo apt-get update && apt-get upgrade -y
   sudo apt-get install curl -y
-  sudo apt autoremove
+  sudo apt autoremove -y
 }
 
 #The purpose of this function is to download the Wazuh isntallation script from
@@ -35,7 +35,6 @@ perform-system-updates(){
 download-and-run-installer(){
   sudo curl -sO https://packages.wazuh.com/4.13/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
 }
-
 
 #The purpose of this function is to disable Wazuh updates as the updates may 
 #break the environment. While this is a recomended action by Wazuh, users
@@ -46,15 +45,10 @@ diable-wazuh-updates(){
   apt update
 }
 
-
-
-
-
 main(){
   check-for-admin
   perform-system-updates
   download-and-run-installer
-  #run-installer
   #diable-wazuh-updates  Uncomment to disable Wazuh updates
   echo -e -n "${GREEN}"
   echo "RECORD LOGIN CREDENTIALS LISTED ABOVE TO ACCESS THE DASHBOARD"
