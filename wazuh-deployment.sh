@@ -13,8 +13,6 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 RESET='\033[0m'
 
-INSTALL_DIR="/app"
-
 #The purpose of this function is to check if the script is being executed with
 #root/admin permissions. This is required for certian aspects of the script.
 check-for-admin(){
@@ -24,22 +22,20 @@ check-for-admin(){
   fi
 }
 
+#The purpose of this function is to update the underlying host system and
+#download any dependancies required for installation
 perform-system-updates(){
   sudo apt-get update && apt-get upgrade -y
+  sudo apt-get install curl -y
+  sudo apt autoremove
 }
 
 #The purpose of this function is to download the Wazuh isntallation script from
-#official source and place it in the defined directory.
-download-app-files(){
-  wget -P $INSTALL_DIR wazuh-install.sh https://packages.wazuh.com/4.13/wazuh-install.sh
+#official source and run the installer.
+download-and-run-installer(){
+  sudo curl -sO https://packages.wazuh.com/4.13/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
 }
 
-#The purpose of this function is to run the downloaded installation file
-run-installer(){
-  sudo chmod +x $INSTALL_DIR/wazuh-install.sh
-  sudo bash $INSTALL_DIR/wazuh-install.sh -a
-  sudo chmod 440 $INSTALL_DIR/wazuh-install.sh
-}
 
 #The purpose of this function is to disable Wazuh updates as the updates may 
 #break the environment. While this is a recomended action by Wazuh, users
@@ -57,9 +53,8 @@ diable-wazuh-updates(){
 main(){
   check-for-admin
   perform-system-updates
-  mkdir $INSTALL_DIR
-  download-app-files
-  run-installer
+  download-and-run-installer
+  #run-installer
   #diable-wazuh-updates  Uncomment to disable Wazuh updates
   echo -e -n "${GREEN}"
   echo "RECORD LOGIN CREDENTIALS LISTED ABOVE TO ACCESS THE DASHBOARD"
