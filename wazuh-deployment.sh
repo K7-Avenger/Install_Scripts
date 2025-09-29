@@ -47,6 +47,31 @@ diable-wazuh-updates(){
   apt update
 }
 
+get_network_cidr() {
+    # Get "IP/Prefix" of default interface
+    ipcidr=$(ip -o -4 addr show "$(ip route show default | awk '/default/ {print $5}')" | awk '{print $4}')
+    ip=${ipcidr%/*}
+    prefix=${ipcidr#*/}
+
+    # Convert IP to integer
+    IFS=. read -r o1 o2 o3 o4 <<< "$ip"
+    ipint=$(( (o1 << 24) + (o2 << 16) + (o3 << 8) + o4 ))
+
+    # Build netmask from prefix length
+    mask=$(( 0xFFFFFFFF << (32 - prefix) & 0xFFFFFFFF ))
+
+    # Network address = IP & netmask
+    net=$(( ipint & mask ))
+
+    # Convert back to dotted-decimal
+    printf "%d.%d.%d.%d/%s\n" \
+        $(( (net >> 24) & 255 )) \
+        $(( (net >> 16) & 255 )) \
+        $(( (net >> 8) & 255 )) \
+        $(( net & 255 )) \
+        "$prefix"
+}
+
 main(){
   check-for-admin
   perform-system-updates
