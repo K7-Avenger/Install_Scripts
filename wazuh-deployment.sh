@@ -64,13 +64,42 @@ get_network_cidr() {
     net=$(( ipint & mask ))
 
     # Convert back to dotted-decimal
-    printf "%d.%d.%d.%d/%s\n" \
+    CIDR=$(printf "%d.%d.%d.%d/%s\n" \
         $(( (net >> 24) & 255 )) \
         $(( (net >> 16) & 255 )) \
         $(( (net >> 8) & 255 )) \
         $(( net & 255 )) \
-        "$prefix"
+        "$prefix")
+		
+	return $CIDR
 }
+
+
+enable-syslog-reciever() {		#Needs testing
+    CONF_FILE="/var/ossec/etc/ossec.conf"
+    BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
+	WAZUH_MANAGER_IP="127.0.0.1"
+
+    # Step 1: compute CIDR
+    CIDR_IP=get_network_cidr
+
+    # Step 2: backup config
+    sudo cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
+    echo "Backup saved to $BACKUP_FILE"
+
+    # Step 3: insert new remote block
+    sudo sed -i "/<\/ossec_config>/i \  <remote>\n    <connection>syslog</connection>\n    <port>514</port>\n    <protocol>tcp</protocol>\n    <allowed-ips>${CIDR_IP}</allowed-ips>\n    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\n  </remote>\n" "$CONF_FILE"
+
+    echo "New <remote> block added with allowed-ips=${CIDR_IP}"
+
+    # Step 4: show the newly added block (last occurrence of <remote>…</remote>)
+    echo "🔍 Verifying inserted block:"
+    awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n6
+
+	systemctl restart wazuh-manager
+	systemctl status wazuh-manager
+}
+
 
 main(){
   check-for-admin
@@ -85,3 +114,4 @@ main(){
 }
 
 main
+
