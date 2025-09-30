@@ -93,17 +93,28 @@ enable_syslog_reciever(){		#Needs testing/further refinement
 
   CIDR_IP=$(get_network_cidr)
 
-  sudo cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
-  echo "Backup saved to $BACKUP_FILE"
+  if [[ ! -f "$CONF_FILE" ]]; then
+    echo "Wazuh config $CONF_FILE not found; aborting."
+    return 1
+  fi
 
-  sudo sed -i "/<\/ossec_config>/i \  <remote>\n    <connection>syslog</connection>\n    <port>514</port>\n    <protocol>tcp</protocol>\n    <allowed-ips>${CIDR_IP}</allowed-ips>\n    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\n  </remote>\n" "$CONF_FILE"
-  echo "New <remote> block added with allowed-ips=${CIDR_IP}"
+  # Check if syslog <remote> block already exists
+  if grep -q "<connection>syslog</connection>" "$CONF_FILE"; then
+    echo "Syslog <remote> block already present in $CONF_FILE — skipping insertion."
+  else
+    cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
+    echo "Backup saved to $BACKUP_FILE"
 
-  echo "🔍 Verifying inserted block:"
-  awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n6
+    # Insert <remote> block before </ossec_config>
+    sed -i "/<\/ossec_config>/i \\  <remote>\\n    <connection>syslog</connection>\\n    <port>514</port>\\n    <protocol>tcp</protocol>\\n    <allowed-ips>${CIDR_IP}</allowed-ips>\\n    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\\n  </remote>\\n" "$CONF_FILE"
+    echo "New <remote> block added with allowed-ips=${CIDR_IP}"
+  fi
+
+  echo "🔍 Verifying syslog <remote> block:"
+  awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n10
 
   systemctl restart wazuh-manager
-  systemctl status wazuh-manager
+  systemctl status --no-pager wazuh-manager
 }
 
 
