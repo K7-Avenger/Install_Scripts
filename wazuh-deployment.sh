@@ -55,7 +55,7 @@ diable-wazuh-updates(){
   apt update
 }
 
-get_network_cidr() {
+get_network_cidr(){
     # Get "IP/Prefix" of default interface
     ipcidr=$(ip -o -4 addr show "$(ip route show default | awk '/default/ {print $5}')" | awk '{print $4}')
     ip=${ipcidr%/*}
@@ -86,7 +86,7 @@ get_network_cidr() {
 #allow Wazuh to receive syslog events from non-Wazuh-agent sources. This
 #will enable Wazuh to collect syslog events froum sources not capable of
 #running an agent such as routers/switches/firewalls, etc. 
-enable-syslog-reciever() {		#Needs testing/further refinement
+enable-syslog-reciever(){		#Needs testing/further refinement
   echo "Enabling collection of syslog events from non-agent sources..."
   CONF_FILE="/var/ossec/etc/ossec.conf"
   BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
