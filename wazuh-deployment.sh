@@ -35,7 +35,13 @@ perform-system-updates(){
 #The purpose of this function is to download the Wazuh isntallation script from
 #official source and run the installer.
 download-and-run-installer(){
+  echo "Downloading and running Wazuh installer"
   sudo curl -sO https://packages.wazuh.com/4.13/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
+  echo -e -n "${GREEN}"
+  echo "RECORD LOGIN CREDENTIALS LISTED ABOVE TO ACCESS THE DASHBOARD"
+  echo -e -n "${GREEN}"
+  echo -n "Login at https://$(hostname -I | cut -d ' ' -f1):443 with the provided credentials"
+  echo -e "${RESET}"
 }
 
 #The purpose of this function is to disable Wazuh updates as the updates may 
@@ -43,6 +49,8 @@ download-and-run-installer(){
 #are encouraged to follow best practices and any applicable rules, regulations,
 #and/or organizational policies.
 diable-wazuh-updates(){
+  echo "Per Wazuh documentation, disabling Wazuh-specific updates"
+  echo "For more information see https://documentation.wazuh.com/current/quickstart.html"
   sed -i "s/^deb /#deb /" /etc/apt/sources.list.d/wazuh.list
   apt update
 }
@@ -74,44 +82,64 @@ get_network_cidr() {
 	return $CIDR
 }
 
+#The purpose of this function is to modify the default configuration to
+#allow Wazuh to receive syslog events from non-Wazuh-agent sources. This
+#will enable Wazuh to collect syslog events froum sources not capable of
+#running an agent such as routers/switches/firewalls, etc. 
+enable-syslog-reciever() {		#Needs testing/further refinement
+  echo "Enabling collection of syslog events from non-agent sources..."
+  CONF_FILE="/var/ossec/etc/ossec.conf"
+  BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
+  WAZUH_MANAGER_IP="127.0.0.1"
 
-enable-syslog-reciever() {		#Needs testing
-    CONF_FILE="/var/ossec/etc/ossec.conf"
-    BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
-	WAZUH_MANAGER_IP="127.0.0.1"
+  CIDR_IP=get_network_cidr
 
-    # Step 1: compute CIDR
-    CIDR_IP=get_network_cidr
+  sudo cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
+  echo "Backup saved to $BACKUP_FILE"
 
-    # Step 2: backup config
-    sudo cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
-    echo "Backup saved to $BACKUP_FILE"
+  sudo sed -i "/<\/ossec_config>/i \  <remote>\n    <connection>syslog</connection>\n    <port>514</port>\n    <protocol>tcp</protocol>\n    <allowed-ips>${CIDR_IP}</allowed-ips>\n    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\n  </remote>\n" "$CONF_FILE"
+  echo "New <remote> block added with allowed-ips=${CIDR_IP}"
 
-    # Step 3: insert new remote block
-    sudo sed -i "/<\/ossec_config>/i \  <remote>\n    <connection>syslog</connection>\n    <port>514</port>\n    <protocol>tcp</protocol>\n    <allowed-ips>${CIDR_IP}</allowed-ips>\n    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\n  </remote>\n" "$CONF_FILE"
+  echo "🔍 Verifying inserted block:"
+  awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n6
 
-    echo "New <remote> block added with allowed-ips=${CIDR_IP}"
-
-    # Step 4: show the newly added block (last occurrence of <remote>…</remote>)
-    echo "🔍 Verifying inserted block:"
-    awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n6
-
-	systemctl restart wazuh-manager
-	systemctl status wazuh-manager
+  systemctl restart wazuh-manager
+  systemctl status wazuh-manager
 }
 
 
 main(){
   check-for-admin
   perform-system-updates
-  download-and-run-installer
-  #diable-wazuh-updates  Uncomment to disable Wazuh updates
-  echo -e -n "${GREEN}"
-  echo "RECORD LOGIN CREDENTIALS LISTED ABOVE TO ACCESS THE DASHBOARD"
-  echo -e -n "${GREEN}"
-  echo -n "Login at https://$(hostname -I | cut -d ' ' -f1):443 with the provided credentials"
-  echo -e "${RESET}"
+  while getopts 'idea :' OPTION; do
+    case "$OPTION" in
+	  i)
+		download-and-run-installer
+		;;
+	  d)
+		diable-wazuh-updates
+		;;
+	  e)
+		enable-syslog-reciever
+		;;
+	  a)
+	    download-and-run-installer
+		diable-wazuh-updates
+		enable-syslog-reciever
+		;;
+	  ?)
+		echo -e "Correct usage:\t $(basename $0) -flag(s)"
+		echo -e "-i\t Downloads and runs the Wazuh installation script"
+		echo -e "-d\t Disables Wazuh-specific updates."
+		echo -e "-e\t Enables collection of syslog events from non-agent sources"
+		echo -e "-a\t Performs all steps, (download, disable updates, enable syslog collection)."
+		exit
+		;;
+	  esac
+  done
 }
+
+
 
 main
 
