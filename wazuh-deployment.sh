@@ -122,19 +122,19 @@ check_for_admin
 while getopts 'idea :' OPTION; do
 	case "$OPTION" in
 		i)
-			perform-system-updates
-			download-and-run-installer
+			perform_system_updates
+			download_and_run_installer
 			;;
 		d)
-			diable-wazuh-updates
+			diable_wazuh_updates
 			;;
 		e)
-			enable-syslog-reciever
+			enable_syslog_reciever
 			;;
 		a)
-			download-and-run-installer
-			diable-wazuh-updates
-			enable-syslog-reciever
+			download_and_run_installer
+			diable_wazuh_updates
+			enable_syslog_reciever
 			;;
 		?)
 			echo -e "Correct usage:\t $(basename $0) -flag(s)"
