@@ -15,7 +15,7 @@ RESET='\033[0m'
 
 #The purpose of this function is to check if the script is being executed with
 #root/admin permissions. This is required for certian aspects of the script.
-check-for-admin(){
+check_for_admin(){
   if [[ "$EUID" -ne 0 ]]; then
     echo -e -n "${RED}"
     echo "This script must be run as root. Use sudo or switch to the root user."
@@ -26,7 +26,7 @@ check-for-admin(){
 
 #The purpose of this function is to update the underlying host system and
 #download any dependancies required for installation
-perform-system-updates(){
+perform_system_updates(){
   sudo apt-get update && apt-get upgrade -y
   sudo apt-get install curl -y
   sudo apt autoremove -y
@@ -34,7 +34,7 @@ perform-system-updates(){
 
 #The purpose of this function is to download the Wazuh isntallation script from
 #official source and run the installer.
-download-and-run-installer(){
+download_and_run_installer(){
   echo "Downloading and running Wazuh installer"
   sudo curl -sO https://packages.wazuh.com/4.13/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
   echo -e -n "${GREEN}"
@@ -48,7 +48,7 @@ download-and-run-installer(){
 #break the environment. While this is a recomended action by Wazuh, users
 #are encouraged to follow best practices and any applicable rules, regulations,
 #and/or organizational policies.
-diable-wazuh-updates(){
+diable_wazuh_updates(){
   echo "Per Wazuh documentation, disabling Wazuh-specific updates"
   echo "For more information see https://documentation.wazuh.com/current/quickstart.html"
   sed -i "s/^deb /#deb /" /etc/apt/sources.list.d/wazuh.list
@@ -57,7 +57,8 @@ diable-wazuh-updates(){
 
 get_network_cidr(){
     # Get "IP/Prefix" of default interface
-    ipcidr=$(ip -o -4 addr show "$(ip route show default | awk '/default/ {print $5}')" | awk '{print $4}')
+    iface=$(ip route show default | awk '/default/ {print $5}')
+    ipcidr=$(ip -o -4 addr show "$iface" | awk '{print $4}')
     ip=${ipcidr%/*}
     prefix=${ipcidr#*/}
 
@@ -71,28 +72,26 @@ get_network_cidr(){
     # Network address = IP & netmask
     net=$(( ipint & mask ))
 
-    # Convert back to dotted-decimal
-    CIDR=$(printf "%d.%d.%d.%d/%s\n" \
+    # Convert back to dotted-decimal and print CIDR
+    printf "%d.%d.%d.%d/%s\n" \
         $(( (net >> 24) & 255 )) \
         $(( (net >> 16) & 255 )) \
         $(( (net >> 8) & 255 )) \
         $(( net & 255 )) \
-        "$prefix")
-		
-	return $CIDR
+        "$prefix"
 }
 
 #The purpose of this function is to modify the default configuration to
 #allow Wazuh to receive syslog events from non-Wazuh-agent sources. This
 #will enable Wazuh to collect syslog events froum sources not capable of
 #running an agent such as routers/switches/firewalls, etc. 
-enable-syslog-reciever(){		#Needs testing/further refinement
+enable_syslog_reciever(){		#Needs testing/further refinement
   echo "Enabling collection of syslog events from non-agent sources..."
   CONF_FILE="/var/ossec/etc/ossec.conf"
   BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
   WAZUH_MANAGER_IP="127.0.0.1"
 
-  CIDR_IP=get_network_cidr
+  CIDR_IP=$(get_network_cidr)
 
   sudo cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
   echo "Backup saved to $BACKUP_FILE"
@@ -108,7 +107,7 @@ enable-syslog-reciever(){		#Needs testing/further refinement
 }
 
 
-check-for-admin
+check_for_admin
 while getopts 'idea :' OPTION; do
 	case "$OPTION" in
 		i)
