@@ -108,38 +108,31 @@ enable-syslog-reciever(){		#Needs testing/further refinement
 }
 
 
-main(){
-	check-for-admin
-	while getopts 'idea :' OPTION; do
-		case "$OPTION" in
-			i)
-				perform-system-updates
-				download-and-run-installer
-				;;
-			d)
-				diable-wazuh-updates
-				;;
-			e)
-				enable-syslog-reciever
-				;;
-			a)
-				download-and-run-installer
-				diable-wazuh-updates
-				enable-syslog-reciever
-				;;
-			?)
-				echo -e "Correct usage:\t $(basename $0) -flag(s)"
-				echo -e "-i\t Downloads and runs the Wazuh installation script"
-				echo -e "-d\t Disables Wazuh-specific updates."
-				echo -e "-e\t Enables collection of syslog events from non-agent sources"
-				echo -e "-a\t Performs all steps, (download, disable updates, enable syslog collection)."
-				exit
-				;;
-		esac
-	done
-}
-
-
-
-main
-
+check-for-admin
+while getopts 'idea :' OPTION; do
+	case "$OPTION" in
+		i)
+			perform-system-updates
+			download-and-run-installer
+			;;
+		d)
+			diable-wazuh-updates
+			;;
+		e)
+			enable-syslog-reciever
+			;;
+		a)
+			download-and-run-installer
+			diable-wazuh-updates
+			enable-syslog-reciever
+			;;
+		?)
+			echo -e "Correct usage:\t $(basename $0) -flag(s)"
+			echo -e "-i\t Downloads and runs the Wazuh installation script"
+			echo -e "-d\t Disables Wazuh-specific updates."
+			echo -e "-e\t Enables collection of syslog events from non-agent sources"
+			echo -e "-a\t Performs all steps, (download, disable updates, enable syslog collection)."
+			exit
+			;;
+	esac
+done
