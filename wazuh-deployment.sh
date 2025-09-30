@@ -27,16 +27,16 @@ check_for_admin(){
 #The purpose of this function is to update the underlying host system and
 #download any dependancies required for installation
 perform_system_updates(){
-  sudo apt-get update && apt-get upgrade -y
-  sudo apt-get install curl -y
-  sudo apt autoremove -y
+  apt-get update && apt-get upgrade -y
+  apt-get install curl -y
+  apt autoremove -y
 }
 
 #The purpose of this function is to download the Wazuh isntallation script from
 #official source and run the installer.
 download_and_run_installer(){
   echo "Downloading and running Wazuh installer"
-  sudo curl -sO https://packages.wazuh.com/4.13/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
+  curl -sO https://packages.wazuh.com/4.13/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
   echo -e -n "${GREEN}"
   echo "RECORD LOGIN CREDENTIALS LISTED ABOVE TO ACCESS THE DASHBOARD"
   echo -e -n "${GREEN}"
@@ -113,8 +113,16 @@ enable_syslog_reciever(){		#Needs testing/further refinement
   echo "🔍 Verifying syslog <remote> block:"
   awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n10
 
+  echo -e -n "${GREEN}"
+  echo "Restarting the wazuh-manager service, please wait..."
+  echo -e -n "${RESET}"
+  
   systemctl restart wazuh-manager
   systemctl status --no-pager wazuh-manager
+
+  echo -e -n "${GREEN}"
+  echo "Done!"
+  echo -e -n "${RESET}"
 }
 
 
