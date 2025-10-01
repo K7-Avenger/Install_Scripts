@@ -148,12 +148,12 @@ while getopts 'idea :' OPTION; do
 			diable_wazuh_updates
 			;;
 		e)
-			enable_syslog_reciever
+			enable_syslog_receiver
 			;;
 		a)
 			download_and_run_installer
 			diable_wazuh_updates
-			enable_syslog_reciever
+			enable_syslog_receiver
 			;;
 		?)
 			echo -e "Correct usage:\t $(basename $0) -flag(s)"
