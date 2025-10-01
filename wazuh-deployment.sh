@@ -85,13 +85,14 @@ get_network_cidr(){
 #allow Wazuh to receive syslog events from non-Wazuh-agent sources. This
 #will enable Wazuh to collect syslog events froum sources not capable of
 #running an agent such as routers/switches/firewalls, etc. 
+# Enable syslog collection from non-agent sources (idempotent, supports repeated -e calls)
 enable_syslog_receiver(){
   echo "Enabling collection of syslog events from non-agent sources..."
   CONF_FILE="/var/ossec/etc/ossec.conf"
   BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%Y%m%d-%H%M%S)"
   WAZUH_MANAGER_IP="127.0.0.1"
 
-  # Host's CIDR (always included unless already present)
+  # Always include host's network CIDR
   CIDR_IP=$(get_network_cidr)
 
   # Combine host CIDR with any user-supplied extra CIDRs
@@ -107,26 +108,45 @@ enable_syslog_receiver(){
   echo "Backup saved to $BACKUP_FILE"
 
   if grep -q "<connection>syslog</connection>" "$CONF_FILE"; then
-    echo "Syslog <remote> block already exists — appending new allowed-ips if missing."
+    echo "Syslog <remote> block already exists — merging allowed-ips entries."
+
+    # Extract existing IPs between <allowed-ips> ... </allowed-ips>
+    EXISTING_IPS=$(awk '/<allowed-ips>/{flag=1;next}/<\/allowed-ips>/{flag=0}flag' "$CONF_FILE")
+    MERGED_IPS=($EXISTING_IPS)
 
     for ip in "${NEW_IPS[@]}"; do
-      if ! grep -q "<allowed-ips>${ip}</allowed-ips>" "$CONF_FILE"; then
-        # Insert just before </remote>
-        sed -i "/<\/remote>/i \    <allowed-ips>${ip}</allowed-ips>" "$CONF_FILE"
+      if [[ ! " ${MERGED_IPS[*]} " =~ " ${ip} " ]]; then
+        MERGED_IPS+=("$ip")
         echo "Added new allowed-ips: $ip"
       else
-        echo "Allowed-ips $ip already present, skipping."
+        echo "allowed-ips $ip already present, skipping."
       fi
     done
 
-  else
-    echo "Syslog <remote> block not found — creating new one."
-    ALLOWED_XML=""
-    for ip in "${NEW_IPS[@]}"; do
-      ALLOWED_XML+="    <allowed-ips>${ip}</allowed-ips>\n"
+    # Rebuild the <allowed-ips> block
+    ALLOWED_BLOCK="  <allowed-ips>\n"
+    for ip in "${MERGED_IPS[@]}"; do
+      ALLOWED_BLOCK+="    ${ip}\n"
     done
+    ALLOWED_BLOCK+="  </allowed-ips>"
 
-    sed -i "/<\/ossec_config>/i \\  <remote>\\n    <connection>syslog</connection>\\n    <port>514</port>\\n    <protocol>tcp</protocol>\\n${ALLOWED_XML}    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\\n  </remote>\\n" "$CONF_FILE"
+    # Replace the old block with the new one
+    awk -v block="$ALLOWED_BLOCK" '
+      BEGIN{inblock=0}
+      /<allowed-ips>/{inblock=1;print block;next}
+      /<\/allowed-ips>/{inblock=0;next}
+      !inblock{print}
+    ' "$CONF_FILE" > "${CONF_FILE}.tmp" && mv "${CONF_FILE}.tmp" "$CONF_FILE"
+
+  else
+    echo "No syslog <remote> block found — creating one with provided IPs."
+    ALLOWED_BLOCK="  <allowed-ips>\n"
+    for ip in "${NEW_IPS[@]}"; do
+      ALLOWED_BLOCK+="    ${ip}\n"
+    done
+    ALLOWED_BLOCK+="  </allowed-ips>"
+
+    sed -i "/<\/ossec_config>/i \\<remote>\\n  <connection>syslog</connection>\\n  <port>514</port>\\n  <protocol>tcp</protocol>\\n${ALLOWED_BLOCK}\\n  <local_ip>${WAZUH_MANAGER_IP}</local_ip>\\n</remote>\\n" "$CONF_FILE"
   fi
 
   echo "Current syslog <remote> block:"
@@ -135,6 +155,7 @@ enable_syslog_receiver(){
   systemctl restart wazuh-manager
   systemctl status --no-pager wazuh-manager
 }
+
 
 
 check_for_admin
