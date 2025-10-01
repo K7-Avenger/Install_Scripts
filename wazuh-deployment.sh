@@ -85,44 +85,54 @@ get_network_cidr(){
 #allow Wazuh to receive syslog events from non-Wazuh-agent sources. This
 #will enable Wazuh to collect syslog events froum sources not capable of
 #running an agent such as routers/switches/firewalls, etc. 
-enable_syslog_reciever(){		#Needs testing/further refinement
+enable_syslog_receiver(){
   echo "Enabling collection of syslog events from non-agent sources..."
   CONF_FILE="/var/ossec/etc/ossec.conf"
   BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
   WAZUH_MANAGER_IP="127.0.0.1"
 
+  # Host's CIDR (always included unless already present)
   CIDR_IP=$(get_network_cidr)
+
+  # Combine host CIDR with any user-supplied extra CIDRs
+  NEW_IPS=("$CIDR_IP" "$@")
 
   if [[ ! -f "$CONF_FILE" ]]; then
     echo "Wazuh config $CONF_FILE not found; aborting."
     return 1
   fi
 
-  # Check if syslog <remote> block already exists
-  if grep -q "<connection>syslog</connection>" "$CONF_FILE"; then
-    echo "Syslog <remote> block already present in $CONF_FILE — skipping insertion."
-  else
-    cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
-    echo "Backup saved to $BACKUP_FILE"
+  cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
+  echo "Backup saved to $BACKUP_FILE"
 
-    # Insert <remote> block before </ossec_config>
-    sed -i "/<\/ossec_config>/i \\  <remote>\\n    <connection>syslog</connection>\\n    <port>514</port>\\n    <protocol>tcp</protocol>\\n    <allowed-ips>${CIDR_IP}</allowed-ips>\\n    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\\n  </remote>\\n" "$CONF_FILE"
-    echo "New <remote> block added with allowed-ips=${CIDR_IP}"
+  if grep -q "<connection>syslog</connection>" "$CONF_FILE"; then
+    echo "Syslog <remote> block already exists — appending new allowed-ips if missing."
+
+    for ip in "${NEW_IPS[@]}"; do
+      if ! grep -q "<allowed-ips>${ip}</allowed-ips>" "$CONF_FILE"; then
+        # Insert just before </remote>
+        sed -i "/<\/remote>/i \    <allowed-ips>${ip}</allowed-ips>" "$CONF_FILE"
+        echo "Added new allowed-ips: $ip"
+      else
+        echo "allowed-ips $ip already present, skipping."
+      fi
+    done
+
+  else
+    echo "Syslog <remote> block not found — creating new one."
+    ALLOWED_XML=""
+    for ip in "${NEW_IPS[@]}"; do
+      ALLOWED_XML+="    <allowed-ips>${ip}</allowed-ips>\n"
+    done
+
+    sed -i "/<\/ossec_config>/i \\  <remote>\\n    <connection>syslog</connection>\\n    <port>514</port>\\n    <protocol>tcp</protocol>\\n${ALLOWED_XML}    <local_ip>${WAZUH_MANAGER_IP}</local_ip>\\n  </remote>\\n" "$CONF_FILE"
   fi
 
-  echo "🔍 Verifying syslog <remote> block:"
-  awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE" | tail -n10
+  echo "Current syslog <remote> block:"
+  awk '/<remote>/{flag=1} flag{print} /<\/remote>/{flag=0}' "$CONF_FILE"
 
-  echo -e -n "${GREEN}"
-  echo "Restarting the wazuh-manager service, please wait..."
-  echo -e -n "${RESET}"
-  
   systemctl restart wazuh-manager
   systemctl status --no-pager wazuh-manager
-
-  echo -e -n "${GREEN}"
-  echo "Done!"
-  echo -e -n "${RESET}"
 }
 
 
