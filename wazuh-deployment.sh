@@ -120,7 +120,7 @@ enable_syslog_receiver(){
     done
 
   else
-    echo "ℹ️  Syslog <remote> block not found — creating new one."
+    echo "Syslog <remote> block not found — creating new one."
     ALLOWED_XML=""
     for ip in "${NEW_IPS[@]}"; do
       ALLOWED_XML+="    <allowed-ips>${ip}</allowed-ips>\n"
