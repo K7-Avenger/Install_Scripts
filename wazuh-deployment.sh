@@ -88,7 +88,7 @@ get_network_cidr(){
 enable_syslog_receiver(){
   echo "Enabling collection of syslog events from non-agent sources..."
   CONF_FILE="/var/ossec/etc/ossec.conf"
-  BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%F-%H%M%S)"
+  BACKUP_FILE="/var/ossec/etc/ossec.conf.bak.$(date +%Y%m%d-%H%M%S)"
   WAZUH_MANAGER_IP="127.0.0.1"
 
   # Host's CIDR (always included unless already present)
@@ -102,6 +102,7 @@ enable_syslog_receiver(){
     return 1
   fi
 
+  # Always make a timestamped backup
   cp "$CONF_FILE" "$BACKUP_FILE" || { echo "Backup failed"; return 1; }
   echo "Backup saved to $BACKUP_FILE"
 
@@ -114,12 +115,12 @@ enable_syslog_receiver(){
         sed -i "/<\/remote>/i \    <allowed-ips>${ip}</allowed-ips>" "$CONF_FILE"
         echo "Added new allowed-ips: $ip"
       else
-        echo "allowed-ips $ip already present, skipping."
+        echo "Allowed-ips $ip already present, skipping."
       fi
     done
 
   else
-    echo "Syslog <remote> block not found — creating new one."
+    echo "ℹ️  Syslog <remote> block not found — creating new one."
     ALLOWED_XML=""
     for ip in "${NEW_IPS[@]}"; do
       ALLOWED_XML+="    <allowed-ips>${ip}</allowed-ips>\n"
