@@ -11,7 +11,7 @@ GREEN='\033[0;32m'
 RESET='\033[0m'
 
 
-INSTALL_DIR="/opt/ai-testing"
+INSTALL_DIR="ai-testing"
 LLM_STUDIO_DEB_SHA="40308930cf9c848cfe0e0c0e353f86a85e54f8ff09c758e0974854f8529d1b6ef5e30bad31a7f8251fedbb2734769e017085144d3ee595889c1e12f6d26e0afe"
 
 #The purpose of this function is to check if the script is being executed with
@@ -27,12 +27,9 @@ system-update(){
   sudo apt-get update && sudo apt-get upgrade -y
 }
 
-
-
 download-dependancies(){
   mkdir $INSTALL_DIR
-  wget https://lmstudio.ai/download/latest/linux/x64?format=deb
-
+  wget -P /$INSTALL_DIR https://lmstudio.ai/linux/x64/0.4.16-2/LM-Studio-0.4.16-2-x64.deb
 }
 
 validateFileChecksums(){
