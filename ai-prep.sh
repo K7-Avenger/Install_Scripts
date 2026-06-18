@@ -64,7 +64,7 @@ validateFileChecksums(){
 
 install-dependancies(){
   sudo apt install curl -y
-  curl -fsSL https://lmstudio.ai/install.sh | bash
+  #curl -fsSL https://lmstudio.ai/install.sh | bash #<--llmster is LM Studio's headless daemon for servers, cloud instances, and CI.
   curl -fsSL https://lmstudio.ai/download/latest/linux/x64?format=deb
   curl -fsSL https://hermes-agent-nousresearch.com/install.sh | bash
   #hermes setup #
