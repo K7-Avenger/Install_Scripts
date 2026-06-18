@@ -21,8 +21,20 @@ check-for-admin(){
   fi
 }
 
+system-update(){
+  sudo apt-get update && sudo apt-get upgrade -y
+}
+
 install-ai-dependancies(){
   curl -fsSL https://lmstudio.ai/install.sh | bash
   curl -fsSL https://hermes-agent-nousresearch.com/install.sh | bash
-  #hermes setup #
+  hermes setup #
 }
+
+main(){
+  check-for-admin
+  system-update
+  install-ai-dependancies
+}
+
+main
