@@ -35,6 +35,33 @@ download-dependancies(){
 
 }
 
+validateFileChecksums(){
+	#generate installer checksum
+	file_checksum=$(sha512sum $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb | cut -d " " -f1)
+	echo "file checksum is:\n $file_checksum"
+
+	#read checksum provided by Rapid7
+	downloaded_checksum=$LLM_STUDIO_DEB_SHA
+	echo "provided checksum is:\n $downloaded_checksum"
+	
+	#compare checksums, abort installation if they do not match
+	if [[ $file_checksum == $downloaded_checksum ]]; then
+		echo -e -n "${GREEN}"
+		echo "sha512sum match! Install may continue, setting (owner) execute bit..."
+		echo -e "${RESET}"
+		
+		#add execute permissions to .bin installer
+		sudo chmod 544 $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb
+	else
+		echo -e -n "${RED}"
+		echo "sha512sum does not match! Aborting install and removing execute permissions on installer"
+		echo -e "${RESET}"
+		#remove execute permissions to .bin installer
+		sudo chmod -x $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb
+		exit 1
+	fi
+}
+
 install-dependancies(){
   sudo apt install curl -y
   curl -fsSL https://lmstudio.ai/install.sh | bash
