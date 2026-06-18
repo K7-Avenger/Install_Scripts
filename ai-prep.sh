@@ -29,7 +29,7 @@ system-update(){
 
 download-dependancies(){
   mkdir $INSTALL_DIR
-  wget -P /$INSTALL_DIR https://lmstudio.ai/linux/x64/0.4.16-2/LM-Studio-0.4.16-2-x64.deb
+  wget -P /$INSTALL_DIR https://installers.lmstudio.ai/linux/x64/0.4.16-2/LM-Studio-0.4.16-2-x64.deb
 }
 
 validateFileChecksums(){
