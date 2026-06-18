@@ -34,7 +34,7 @@ download-dependancies(){
 
 validateFileChecksums(){
 	#generate installer checksum
-	file_checksum=$(sha512sum $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb | cut -d " " -f1)
+	file_checksum=$(sha512sum $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb | cut -d " " -f1)
 	echo "file checksum is:\n $file_checksum"
 
 	#read checksum provided by Rapid7
@@ -48,13 +48,13 @@ validateFileChecksums(){
 		echo -e "${RESET}"
 		
 		#add execute permissions to .bin installer
-		sudo chmod 544 $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb
+		sudo chmod 544 $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb
 	else
 		echo -e -n "${RED}"
 		echo "sha512sum does not match! Aborting install and removing execute permissions on installer"
 		echo -e "${RESET}"
 		#remove execute permissions to .bin installer
-		sudo chmod -x $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb
+		sudo chmod -x $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb
 		exit 1
 	fi
 }
