@@ -27,8 +27,12 @@ system-update(){
   sudo apt-get update && sudo apt-get upgrade -y
 }
 
+create-app-directory(){
+	mkdir $INSTALL_DIR
+}
+
 download-dependancies(){
-  mkdir $INSTALL_DIR
+  create-app-directory
   wget -P /$INSTALL_DIR https://installers.lmstudio.ai/linux/x64/0.4.16-2/LM-Studio-0.4.16-2-x64.deb
 }
 
@@ -51,7 +55,7 @@ validateFileChecksums(){
 		sudo chmod 544 $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb
 	else
 		echo -e -n "${RED}"
-		echo "sha512sum does not match! Aborting install and removing execute permissions on installer"
+		echo "sha512sum does not match! Aborting install and setting permissions on installer to 'read-only'."
 		echo -e "${RESET}"
 		#remove execute permissions to .bin installer
 		sudo chmod -x $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb
@@ -60,17 +64,18 @@ validateFileChecksums(){
 }
 
 install-dependancies(){
-  sudo apt install curl -y
   #curl -fsSL https://lmstudio.ai/install.sh | bash #<--llmster is LM Studio's headless daemon for servers, cloud instances, and CI. May not be needed with full install.
   #curl -fsSL https://lmstudio.ai/download/latest/linux/x64?format=deb
-  curl -fsSL https://hermes-agent-nousresearch.com/install.sh | bash
+  curl -fsSL https://hermes-agent-nousresearch.com/install.sh | bash #<--Convert to wget
   #hermes setup #
 }
 
 main(){
   check-for-admin
   system-update
-  install-ai-dependancies
+  download-dependancies
+  validateFileChecksums
+  #install-ai-dependancies
 }
 
 main
