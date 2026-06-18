@@ -31,7 +31,7 @@ system-update(){
 
 download-dependancies(){
   mkdir $INSTALL_DIR
-  curl -o $INSTALL_DIR/LM-Studio-.0.4.16-2-x64.deb https://lmstudio.ai/download/latest/linux/x64?format=deb
+  wget https://lmstudio.ai/download/latest/linux/x64?format=deb
 
 }
 
