@@ -25,10 +25,11 @@ system-update(){
   sudo apt-get update && sudo apt-get upgrade -y
 }
 
-install-ai-dependancies(){
+install-dependancies(){
+  sudo apt install curl -y
   curl -fsSL https://lmstudio.ai/install.sh | bash
   curl -fsSL https://hermes-agent-nousresearch.com/install.sh | bash
-  hermes setup #
+  #hermes setup #
 }
 
 main(){
