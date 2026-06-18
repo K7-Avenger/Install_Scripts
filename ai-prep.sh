@@ -11,8 +11,8 @@ GREEN='\033[0;32m'
 RESET='\033[0m'
 
 
-INSTALL_DIR="~/ai-testing"
-LM_STUDIO_DEB_SHA="40308930cf9c848cfe0e0c0e353f86a85e54f8ff09c758e0974854f8529d1b6ef5e30bad31a7f8251fedbb2734769e017085144d3ee595889c1e12f6d26e0afe"
+INSTALL_DIR="ai-testing"
+LLM_STUDIO_DEB_SHA="40308930cf9c848cfe0e0c0e353f86a85e54f8ff09c758e0974854f8529d1b6ef5e30bad31a7f8251fedbb2734769e017085144d3ee595889c1e12f6d26e0afe"
 
 #The purpose of this function is to check if the script is being executed with
 #root/admin permissions. This may be required for certian aspects of the script.
@@ -28,22 +28,25 @@ system-update(){
 }
 
 create-app-directory(){
-	mkdir $INSTALL_DIR
+  mkdir $INSTALL_DIR
+  chmod 777 $INSTALL_DIR
 }
 
 download-dependancies(){
   create-app-directory
-  wget -P /$INSTALL_DIR https://installers.lmstudio.ai/linux/x64/0.4.16-2/LM-Studio-0.4.16-2-x64.deb
+  wget -P $INSTALL_DIR https://installers.lmstudio.ai/linux/x64/0.4.16-2/LM-Studio-0.4.16-2-x64.deb
+  chown -R "$SUDO_UID:$SUDO_GID" $INSTALL_DIR
+
 }
 
 validateFileChecksums(){
 	#generate installer checksum
 	file_checksum=$(sha512sum $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb | cut -d " " -f1)
-	echo "file checksum is:\n $file_checksum"
+	echo "file checksum is: $file_checksum"
 
 	#read checksum provided by Rapid7
-	downloaded_checksum=$LM_STUDIO_DEB_SHA
-	echo "provided checksum is:\n $downloaded_checksum"
+	downloaded_checksum=$LLM_STUDIO_DEB_SHA
+	echo "provided checksum is: $downloaded_checksum"
 	
 	#compare checksums, abort installation if they do not match
 	if [[ $file_checksum == $downloaded_checksum ]]; then
@@ -72,7 +75,7 @@ install-dependancies(){
 
 main(){
   check-for-admin
-  system-update
+  #system-update
   download-dependancies
   validateFileChecksums
   #install-ai-dependancies
