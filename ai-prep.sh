@@ -66,7 +66,9 @@ validateFileChecksums(){
 	fi
 }
 
-install-dependancies(){
+install-ai-dependancies(){
+  sudo apt install LM-Studio-0.4.16-2-x64.deb -y
+  bash install.sh
   #curl -fsSL https://lmstudio.ai/install.sh | bash #<--llmster is LM Studio's headless daemon for servers, cloud instances, and CI. May not be needed with full install.
   #curl -fsSL https://lmstudio.ai/download/latest/linux/x64?format=deb
   curl -fsSL https://hermes-agent-nousresearch.com/install.sh | bash #<--Convert to wget
@@ -75,10 +77,10 @@ install-dependancies(){
 
 main(){
   check-for-admin
-  #system-update
+  system-update
   download-dependancies
   validateFileChecksums
-  #install-ai-dependancies
+  install-ai-dependancies
 }
 
 main
