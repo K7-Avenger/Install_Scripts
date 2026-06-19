@@ -74,10 +74,10 @@ install-ai-dependancies(){
 }
 
 main(){
-  #check-for-admin
-  #system-update
-  #download-dependancies
-  #validateFileChecksums
+  check-for-admin
+  system-update
+  download-dependancies
+  validateFileChecksums
   install-ai-dependancies
 }
 
