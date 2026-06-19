@@ -45,7 +45,7 @@ validateFileChecksums(){
 	echo "file checksum is: $file_checksum"
 
 	#read checksum provided by Rapid7
-	LLM_STUDIO_DEB_SHA=$(wget -qO- https://lmstudio.ai/download | grep -oE '[a-fA-F0-9]{128}' | sed -n '2p')
+	downloaded_checksum=$(wget -qO- https://lmstudio.ai/download | grep -oE '[a-fA-F0-9]{128}' | sed -n '2p')
 	echo "provided checksum is: $downloaded_checksum"
 	
 	#compare checksums, abort installation if they do not match
