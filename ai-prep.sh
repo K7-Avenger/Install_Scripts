@@ -67,9 +67,9 @@ validateFileChecksums(){
 }
 
 install-ai-dependancies(){
-  #sudo apt-get install curl -y
+  sudo apt-get install curl -y
   sudo dpkg -i $INSTALL_DIR/LM-Studio-0.4.16-2-x64.deb
-  #bash $INSTALL_DIR/install.sh
+  bash $INSTALL_DIR/install.sh
   #hermes setup #
 }
 
